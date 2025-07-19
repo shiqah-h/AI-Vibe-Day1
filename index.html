@@ -1,0 +1,805 @@
+import React, { useState, useMemo } from 'react';
+import { Briefcase, Code, PenTool, BarChart2, Music, Video, Mic, Star, Search, TrendingUp, Clock, UserCheck, Twitter, Linkedin, Github, Users, ArrowLeft, CheckCircle } from 'lucide-react';
+
+// Mock Data for Freelance Services - Expanded to have 3 jobs per category
+const services = [
+  // Web Development
+  { 
+    id: 1, 
+    category: 'Web Development', 
+    title: 'Modern Website with React', 
+    user: 'TechSavvy', 
+    rating: 4.9,
+    reviewsCount: 132,
+    price: 850, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Web+Dev',
+    description: "I will build a fully responsive, modern, and high-performing website using the latest technologies like React and Next.js. Perfect for startups, personal portfolios, or small businesses looking to make a strong online impression. The final product will be SEO-friendly and optimized for speed.",
+    packages: [
+        { name: 'Basic', price: 850, delivery: 7, features: ['3 Pages', 'Responsive Design', 'Source Code'] },
+        { name: 'Standard', price: 1500, delivery: 14, features: ['5 Pages', 'CMS Integration', 'Basic SEO', 'Source Code'] },
+        { name: 'Premium', price: 2500, delivery: 21, features: ['8+ Pages', 'E-commerce', 'Advanced SEO', '1 Year Support'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'StartupCEO', rating: 5, comment: "Amazing work! Delivered ahead of schedule and the final site is incredibly fast." },
+        { id: 2, reviewer: 'ArtDirector', rating: 5, comment: "TechSavvy understood the vision perfectly. Highly recommended." },
+    ]
+  },
+  { 
+    id: 7, 
+    category: 'Web Development', 
+    title: 'E-commerce Store Setup', 
+    user: 'DevGenius', 
+    rating: 4.9,
+    reviewsCount: 88,
+    price: 1200, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=E-commerce',
+    description: "I will set up a complete, professional e-commerce store for your business using Shopify or WooCommerce. This includes theme customization, product uploads, payment gateway integration, and everything you need to start selling online.",
+    packages: [
+        { name: 'Basic Store', price: 1200, delivery: 7, features: ['Store Setup', 'Up to 20 Products', 'Payment Integration'] },
+        { name: 'Advanced Store', price: 2200, delivery: 14, features: ['Custom Theme', 'Up to 100 Products', 'Plugin Integration'] },
+        { name: 'Enterprise', price: 4000, delivery: 30, features: ['Headless Commerce Setup', 'API Integrations', 'Full Support'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'TShirtCompany', rating: 5, comment: "DevGenius made the whole process of launching our store so easy. A true professional." },
+    ]
+  },
+  { 
+    id: 9, 
+    category: 'Web Development', 
+    title: 'WordPress Site Customization', 
+    user: 'WPMaster', 
+    rating: 4.8,
+    reviewsCount: 65,
+    price: 450, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=WordPress',
+    description: "Need help with your WordPress site? I can customize themes, build custom plugins, fix bugs, and optimize your site for speed and security. No job is too big or too small.",
+    packages: [
+        { name: 'Small Task', price: 150, delivery: 1, features: ['1-2 Hours of Work', 'Bug Fixes', 'CSS Tweaks'] },
+        { name: 'Customization', price: 450, delivery: 3, features: ['Theme Customization', 'Plugin Setup'] },
+        { name: 'Full Build', price: 1500, delivery: 10, features: ['Custom Theme from Scratch', 'Full Site Setup'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'BloggerPro', rating: 5, comment: "Fixed a critical bug on my site in less than an hour. Lifesaver!" },
+    ]
+  },
+  // Graphic Design
+  { 
+    id: 2, 
+    category: 'Graphic Design', 
+    title: 'Minimalist Logo Design', 
+    user: 'CreativeMinds', 
+    rating: 4.8,
+    reviewsCount: 210,
+    price: 300, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Logo+Design',
+    description: "Get a unique and timeless minimalist logo for your brand. I focus on creating simple yet impactful designs that communicate your brand's essence. You will receive multiple concepts and unlimited revisions until you are 100% satisfied.",
+    packages: [
+        { name: 'Basic', price: 300, delivery: 3, features: ['2 Logo Concepts', 'High-Res PNG', 'Vector File'] },
+        { name: 'Standard', price: 550, delivery: 5, features: ['4 Logo Concepts', 'Social Media Kit', 'Stationery Designs'] },
+        { name: 'Premium', price: 900, delivery: 7, features: ['6 Logo Concepts', 'Full Brand Guidelines', 'VIP Support'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'BookAuthor', rating: 5, comment: "The logo is perfect. Simple, elegant, and exactly what I wanted." },
+        { id: 2, reviewer: 'CafeOwner', rating: 4, comment: "Good communication and great concepts. Very happy with the result." },
+    ]
+  },
+  { 
+    id: 8, 
+    category: 'Graphic Design', 
+    title: 'Brand Identity Package', 
+    user: 'PixelPerfect', 
+    rating: 5.0,
+    reviewsCount: 150,
+    price: 700, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Branding',
+    description: "Develop a cohesive and memorable brand identity. This all-in-one package includes logo design, color palette selection, typography, and a comprehensive brand style guide to ensure consistency across all your marketing materials.",
+    packages: [
+        { name: 'Starter', price: 700, delivery: 7, features: ['Logo Design', 'Color Palette', 'Typography'] },
+        { name: 'Business', price: 1400, delivery: 14, features: ['Starter Package', 'Business Card Design', 'Social Media Kit'] },
+        { name: 'Corporate', price: 2500, delivery: 21, features: ['Business Package', 'Full Brand Style Guide', 'Stationery Set'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'ConsultingFirm', rating: 5, comment: "PixelPerfect is an artist. Our new brand identity is clean, professional, and perfectly represents our values." },
+    ]
+  },
+  { 
+    id: 10, 
+    category: 'Graphic Design', 
+    title: 'Social Media Post Templates', 
+    user: 'CreativeMinds', 
+    rating: 4.9,
+    reviewsCount: 180,
+    price: 200, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Templates',
+    description: "Elevate your social media presence with custom, editable templates for Instagram, Facebook, or any other platform. I'll create a set of beautiful, on-brand templates in Canva or Photoshop that you can easily reuse.",
+    packages: [
+        { name: '5 Templates', price: 200, delivery: 3, features: ['5 Post Templates', 'Source Files (Canva/PSD)'] },
+        { name: '10 Templates', price: 350, delivery: 5, features: ['10 Post & Story Templates', 'Source Files'] },
+        { name: 'Full Kit', price: 600, delivery: 7, features: ['15+ Templates', 'Video Templates', 'Highlight Covers'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'Influencer', rating: 5, comment: "These templates saved me so much time and my feed looks amazing!" },
+    ]
+  },
+  // Content Writing
+  { 
+    id: 3, 
+    category: 'Content Writing', 
+    title: 'SEO Optimized Blog Posts', 
+    user: 'WordSmith', 
+    rating: 5.0, 
+    reviewsCount: 98, 
+    price: 150, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Writing',
+    description: "Need compelling content that ranks on Google? I will write high-quality, SEO-optimized blog posts and articles for your website. Each piece is thoroughly researched, engaging, and tailored to your target audience.",
+    packages: [
+        { name: 'Basic', price: 150, delivery: 3, features: ['1 Blog Post (500 words)', 'Keyword Research'] },
+        { name: 'Standard', price: 400, delivery: 5, features: ['3 Blog Posts (500 words)', 'Topic Ideation'] },
+        { name: 'Premium', price: 750, delivery: 7, features: ['5 Blog Posts (750 words)', 'Stock Images Included'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'MarketingMgr', rating: 5, comment: "WordSmith is a fantastic writer. Our blog traffic has increased significantly since we started working with her." },
+    ]
+  },
+  { 
+    id: 11, 
+    category: 'Content Writing', 
+    title: 'Engaging Email Newsletters', 
+    user: 'CopyQueen', 
+    rating: 4.9,
+    reviewsCount: 72,
+    price: 200, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Newsletter',
+    description: "Turn subscribers into customers with email newsletters that people actually want to read. I'll write compelling copy for your email campaigns that drives opens, clicks, and conversions.",
+    packages: [
+        { name: '1 Newsletter', price: 200, delivery: 2, features: ['1 Email (up to 400 words)', '2 Subject Line Options'] },
+        { name: '4 Newsletters', price: 700, delivery: 7, features: ['4 Emails', 'Monthly Campaign Strategy'] },
+        { name: 'Flow Setup', price: 1500, delivery: 10, features: ['Welcome Series (5 emails)', 'Copy + Setup in Mailchimp'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'EcomStore', rating: 5, comment: "Our open rates have never been higher. Amazing copy!" },
+    ]
+  },
+  { 
+    id: 12, 
+    category: 'Content Writing', 
+    title: 'Professional Resume Writing', 
+    user: 'WordSmith', 
+    rating: 5.0,
+    reviewsCount: 115,
+    price: 180, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Resume',
+    description: "Land your dream job with a professionally written resume and cover letter. I will highlight your skills and experience to create a powerful, ATS-friendly document that gets you noticed by recruiters.",
+    packages: [
+        { name: 'Resume', price: 180, delivery: 3, features: ['Professional Resume Writing', 'ATS Optimization'] },
+        { name: 'Resume + Cover', price: 250, delivery: 3, features: ['Resume', 'Custom Cover Letter'] },
+        { name: 'Full Package', price: 400, delivery: 5, features: ['Resume', 'Cover Letter', 'LinkedIn Profile Optimization'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'JobSeeker', rating: 5, comment: "Got three interviews within a week of using my new resume. Thank you!" },
+    ]
+  },
+  // Digital Marketing
+  { 
+    id: 4, 
+    category: 'Digital Marketing', 
+    title: 'Social Media Growth Strategy', 
+    user: 'MarketGuru', 
+    rating: 4.7, 
+    reviewsCount: 150, 
+    price: 600, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Marketing',
+    description: "Let's build a winning social media strategy! I will analyze your brand, identify your target audience, and create a content plan to boost engagement and drive growth across platforms like Instagram, Facebook, and Twitter.",
+    packages: [
+        { name: 'Audit', price: 600, delivery: 7, features: ['1 Platform Audit', 'Competitor Analysis'] },
+        { name: 'Strategy', price: 1200, delivery: 14, features: ['Full Strategy Document', '1-Month Content Calendar'] },
+        { name: 'Management', price: 2000, delivery: 30, features: ['Full Strategy', 'Monthly Management'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'FashionBrand', rating: 5, comment: "Our Instagram has never looked better. The growth has been phenomenal." },
+    ]
+  },
+  { 
+    id: 13, 
+    category: 'Digital Marketing', 
+    title: 'Google Ads Campaign Setup', 
+    user: 'AdWhiz', 
+    rating: 4.8,
+    reviewsCount: 95,
+    price: 550, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Google+Ads',
+    description: "Get immediate traffic and leads with a professionally managed Google Ads (PPC) campaign. I will handle keyword research, ad copywriting, and campaign setup to maximize your return on investment.",
+    packages: [
+        { name: 'Setup', price: 550, delivery: 5, features: ['Campaign Setup', 'Keyword Research', '2 Ad Groups'] },
+        { name: 'Setup + Mngmt', price: 1000, delivery: 30, features: ['Campaign Setup', '1 Month Management', 'Weekly Reporting'] },
+        { name: 'Full Service', price: 1800, delivery: 30, features: ['Setup + Management', 'Landing Page Audit', 'Conversion Tracking'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'LocalBiz', rating: 5, comment: "The phone started ringing the day our campaign went live. Excellent ROI." },
+    ]
+  },
+  { 
+    id: 14, 
+    category: 'Digital Marketing', 
+    title: 'Complete SEO Audit & Report', 
+    user: 'MarketGuru', 
+    rating: 4.9,
+    reviewsCount: 130,
+    price: 700, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=SEO+Audit',
+    description: "Understand exactly what you need to do to rank higher on Google. I will perform a comprehensive technical, on-page, and off-page SEO audit of your website and provide a detailed report with actionable recommendations.",
+    packages: [
+        { name: 'Basic Audit', price: 700, delivery: 7, features: ['Technical SEO Audit', 'On-Page Analysis'] },
+        { name: 'Full Audit', price: 1300, delivery: 10, features: ['Basic Audit', 'Backlink Analysis', 'Competitor Analysis'] },
+        { name: 'Audit + Strategy', price: 2000, delivery: 14, features: ['Full Audit', '6-Month SEO Roadmap'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'SaaSCompany', rating: 5, comment: "The most detailed SEO report I have ever seen. We now have a clear path forward." },
+    ]
+  },
+  // Music & Audio
+  { 
+    id: 5, 
+    category: 'Music & Audio', 
+    title: 'Custom Beat Production', 
+    user: 'BeatMaker', 
+    rating: 4.9, 
+    reviewsCount: 75, 
+    price: 250, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Music',
+    description: "Looking for a unique sound? I'll produce a custom beat tailored to your style, whether it's hip-hop, lo-fi, trap, or electronic. You'll receive high-quality WAV and MP3 files, along with track stems for full flexibility.",
+    packages: [
+        { name: 'MP3 Lease', price: 250, delivery: 3, features: ['High-Quality MP3', 'For Non-Profit Use'] },
+        { name: 'WAV Lease', price: 450, delivery: 3, features: ['WAV + MP3 Files', 'Commercial Use'] },
+        { name: 'Exclusive', price: 800, delivery: 5, features: ['Full Exclusive Rights', 'Track Stems Included'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'RapperMC', rating: 5, comment: "Fire beats! Exactly the vibe I was looking for. Will be back for more." },
+    ]
+  },
+  { 
+    id: 15, 
+    category: 'Music & Audio', 
+    title: 'Podcast Audio Editing & Mixing', 
+    user: 'SoundPro', 
+    rating: 5.0,
+    reviewsCount: 85,
+    price: 100, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Podcast',
+    description: "Make your podcast sound professional and polished. I will edit, mix, and master your podcast audio, removing mistakes, reducing background noise, and balancing levels for a clean, broadcast-quality sound.",
+    packages: [
+        { name: 'Up to 30 mins', price: 100, delivery: 2, features: ['Noise Reduction', 'Mixing & Mastering'] },
+        { name: 'Up to 60 mins', price: 180, delivery: 2, features: ['Noise Reduction', 'ID3 Tagging', 'Mixing & Mastering'] },
+        { name: '4-Episode Pack', price: 650, delivery: 7, features: ['4x 60-min Episodes', 'Show Notes Intro'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'PodcastHost', rating: 5, comment: "SoundPro makes my podcast sound 10x better. Fast turnaround and incredible quality." },
+    ]
+  },
+  { 
+    id: 16, 
+    category: 'Music & Audio', 
+    title: 'Custom Intro/Outro Music', 
+    user: 'BeatMaker', 
+    rating: 4.9,
+    reviewsCount: 92,
+    price: 150, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Jingle',
+    description: "Give your podcast, YouTube channel, or stream a memorable identity with custom intro and outro music. I will create a short, catchy, and royalty-free jingle that fits your brand perfectly.",
+    packages: [
+        { name: 'Intro', price: 150, delivery: 3, features: ['15-second Intro Music', 'Exclusive Rights'] },
+        { name: 'Intro + Outro', price: 250, delivery: 4, features: ['15s Intro + 15s Outro', 'Exclusive Rights'] },
+        { name: 'Full Suite', price: 400, delivery: 5, features: ['Intro/Outro', 'Background Music Loop'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'YouTuber', rating: 5, comment: "The intro music is so catchy! My viewers love it." },
+    ]
+  },
+  // Video & Animation
+  { 
+    id: 6, 
+    category: 'Video & Animation', 
+    title: 'Promotional Video Ad', 
+    user: 'VideoWiz', 
+    rating: 4.8, 
+    reviewsCount: 112, 
+    price: 950, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Video+Ad',
+    description: "Bring your brand to life with a stunning promotional video ad. I create professional, eye-catching animations and video content perfect for social media campaigns, product showcases, or website banners.",
+    packages: [
+        { name: 'Short Ad', price: 950, delivery: 7, features: ['30 Second Video', 'Scriptwriting', 'Stock Footage'] },
+        { name: 'Standard Ad', price: 1800, delivery: 14, features: ['60 Second Video', 'Voice Over', 'Custom Graphics'] },
+        { name: 'Premium Ad', price: 3200, delivery: 21, features: ['90 Second Video', '4K Resolution', 'Advanced Animation'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'AppDeveloper', rating: 5, comment: "The promo video was a huge success. Our downloads increased by 40%!" },
+    ]
+  },
+  { 
+    id: 17, 
+    category: 'Video & Animation', 
+    title: 'Animated Explainer Video', 
+    user: 'MotionMaster', 
+    rating: 4.9,
+    reviewsCount: 105,
+    price: 1200, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Explainer',
+    description: "Simplify complex ideas with a fun and engaging 2D animated explainer video. I will handle everything from script to storyboard, animation, and sound design to create a video that captivates your audience.",
+    packages: [
+        { name: '30 Seconds', price: 1200, delivery: 10, features: ['30s Animation', 'Scriptwriting', 'Voice Over'] },
+        { name: '60 Seconds', price: 2200, delivery: 14, features: ['60s Animation', 'Storyboard', 'Sound Design'] },
+        { name: '90 Seconds', price: 3000, delivery: 21, features: ['90s Animation', 'Custom Characters', '4K'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'TechStartup', rating: 5, comment: "Finally, a video that explains what we do in a simple way. Fantastic work!" },
+    ]
+  },
+  { 
+    id: 18, 
+    category: 'Video & Animation', 
+    title: 'YouTube Video Editing', 
+    user: 'VideoWiz', 
+    rating: 4.8,
+    reviewsCount: 140,
+    price: 250, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=YT+Editing',
+    description: "Take your YouTube content to the next level. I will professionally edit your raw footage, adding cuts, transitions, text, graphics, and color correction to create engaging videos that retain viewers.",
+    packages: [
+        { name: 'Up to 10 mins', price: 250, delivery: 3, features: ['Editing & Color Correction', 'Basic Graphics'] },
+        { name: 'Up to 20 mins', price: 450, delivery: 4, features: ['Editing & Color', 'Advanced Graphics', 'Sound Mixing'] },
+        { name: '4-Video Pack', price: 800, delivery: 14, features: ['4x 10-min Videos', 'Thumbnail Design'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'GamerYT', rating: 5, comment: "My videos look so much more professional now. Editing is top-notch." },
+    ]
+  },
+  // Voice Over
+  { 
+    id: 19, 
+    category: 'Voice Over', 
+    title: 'Professional Male Voice Over', 
+    user: 'VoiceActorPro', 
+    rating: 4.9,
+    reviewsCount: 200,
+    price: 100, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Male+VO',
+    description: "I will provide a professional, broadcast-quality male voice over in an American or British accent. Perfect for commercials, explainer videos, audiobooks, and IVR systems. Recorded in a professional studio.",
+    packages: [
+        { name: 'Up to 100 words', price: 100, delivery: 1, features: ['High-Quality WAV file', 'Commercial Rights'] },
+        { name: 'Up to 500 words', price: 300, delivery: 2, features: ['Proofreading', 'HQ WAV File', 'Commercial Rights'] },
+        { name: 'Up to 1000 words', price: 500, delivery: 3, features: ['Everything included', 'Full Broadcast Rights'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'AdAgency', rating: 5, comment: "Incredible voice and super fast delivery. Our client was thrilled." },
+    ]
+  },
+  { 
+    id: 20, 
+    category: 'Voice Over', 
+    title: 'Female Voice for Commercials', 
+    user: 'VoiceQueen', 
+    rating: 5.0,
+    reviewsCount: 180,
+    price: 120, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Female+VO',
+    description: "I will provide a warm, engaging, and professional female voice over for your project. My versatile voice is perfect for commercials, narrations, e-learning, and more. All audio is delivered fully edited and ready to use.",
+    packages: [
+        { name: 'Up to 100 words', price: 120, delivery: 1, features: ['High-Quality WAV file', 'Commercial Rights'] },
+        { name: 'Up to 500 words', price: 350, delivery: 2, features: ['Proofreading', 'HQ WAV File', 'Commercial Rights'] },
+        { name: 'Up to 1000 words', price: 550, delivery: 3, features: ['Everything included', 'Full Broadcast Rights'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'ElearningCo', rating: 5, comment: "A beautiful voice and a pleasure to work with. Highly recommend." },
+    ]
+  },
+  { 
+    id: 21, 
+    category: 'Voice Over', 
+    title: 'Character Voices for Animation', 
+    user: 'VoiceActorPro', 
+    rating: 4.9,
+    reviewsCount: 150,
+    price: 300, 
+    image: 'https://placehold.co/600x400/2d3748/e2e8f0?text=Character+VO',
+    description: "Bring your animated characters to life! I can perform a wide range of character voices, from heroes and villains to quirky sidekicks. Let's work together to find the perfect voice for your creation.",
+    packages: [
+        { name: '1 Character', price: 300, delivery: 3, features: ['Up to 150 words', '3 Takes per line'] },
+        { name: '3 Characters', price: 800, delivery: 5, features: ['Up to 400 words total', 'Synced to video'] },
+        { name: 'Main Cast', price: 1500, delivery: 7, features: ['Up to 5 characters', 'Full Script Reading'] },
+    ],
+    reviews: [
+        { id: 1, reviewer: 'Animator', rating: 5, comment: "The character voices were hilarious and brought so much life to our short film." },
+    ]
+  },
+];
+
+// Mock Data for Users
+const users = [
+    { id: 1, name: 'TechSavvy', avatar: 'https://placehold.co/100x100/718096/1a202c?text=TS', specialty: 'React Development', rating: 4.9 },
+    { id: 2, name: 'CreativeMinds', avatar: 'https://placehold.co/100x100/718096/1a202c?text=CM', specialty: 'Logo Design & Branding', rating: 4.8 },
+    { id: 3, name: 'WordSmith', avatar: 'https://placehold.co/100x100/718096/1a202c?text=WS', specialty: 'SEO & Content Writing', rating: 5.0 },
+    { id: 4, name: 'MarketGuru', avatar: 'https://placehold.co/100x100/718096/1a202c?text=MG', specialty: 'Social Media Marketing', rating: 4.7 },
+    { id: 5, name: 'BeatMaker', avatar: 'https://placehold.co/100x100/718096/1a202c?text=BM', specialty: 'Music Production', rating: 4.9 },
+    { id: 6, name: 'VideoWiz', avatar: 'https://placehold.co/100x100/718096/1a202c?text=VW', specialty: '2D/3D Animation', rating: 4.8 },
+    { id: 7, name: 'DevGenius', avatar: 'https://placehold.co/100x100/718096/1a202c?text=DG', specialty: 'Full-Stack Development', rating: 4.9 },
+    { id: 8, name: 'PixelPerfect', avatar: 'https://placehold.co/100x100/718096/1a202c?text=PP', specialty: 'UI/UX Design', rating: 5.0 },
+    { id: 9, name: 'VoiceActorPro', avatar: 'https://placehold.co/100x100/718096/1a202c?text=VP', specialty: 'Voice Over Artist', rating: 4.9 },
+    { id: 10, name: 'WPMaster', avatar: 'https://placehold.co/100x100/718096/1a202c?text=WM', specialty: 'WordPress Expert', rating: 4.8 },
+    { id: 11, name: 'CopyQueen', avatar: 'https://placehold.co/100x100/718096/1a202c?text=CQ', specialty: 'Conversion Copywriter', rating: 4.9 },
+    { id: 12, name: 'AdWhiz', avatar: 'https://placehold.co/100x100/718096/1a202c?text=AW', specialty: 'PPC Specialist', rating: 4.8 },
+    { id: 13, name: 'SoundPro', avatar: 'https://placehold.co/100x100/718096/1a202c?text=SP', specialty: 'Audio Engineer', rating: 5.0 },
+    { id: 14, name: 'MotionMaster', avatar: 'https://placehold.co/100x100/718096/1a202c?text=MM', specialty: 'Motion Graphics', rating: 4.9 },
+    { id: 15, name: 'VoiceQueen', avatar: 'https://placehold.co/100x100/718096/1a202c?text=VQ', specialty: 'Female Voice Talent', rating: 5.0 },
+];
+
+// Category Icons Mapping
+const categoryIcons = {
+  'Web Development': <Code className="h-6 w-6" />,
+  'Graphic Design': <PenTool className="h-6 w-6" />,
+  'Content Writing': <Briefcase className="h-6 w-6" />,
+  'Digital Marketing': <BarChart2 className="h-6 w-6" />,
+  'Music & Audio': <Music className="h-6 w-6" />,
+  'Video & Animation': <Video className="h-6 w-6" />,
+  'Voice Over': <Mic className="h-6 w-6" />,
+};
+
+// Header Component
+const Header = () => (
+  <header className="bg-gray-800 shadow-md sticky top-0 z-20">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between h-16">
+        <div className="flex items-center">
+          <Briefcase className="h-8 w-8 text-orange-400" />
+          <h1 className="text-2xl font-bold text-white ml-2">BruLance</h1>
+        </div>
+        <nav className="hidden md:flex items-center space-x-6">
+          <a href="#" className="text-gray-300 hover:text-white transition-colors">Explore</a>
+          <a href="#" className="text-gray-300 hover:text-white transition-colors">Become a Seller</a>
+          <a href="#" className="text-gray-300 hover:text-white transition-colors">Sign In</a>
+          <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+            Join
+          </button>
+        </nav>
+        <div className="md:hidden">
+          <button className="text-gray-300 hover:text-white">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+);
+
+// Service Card Component for Grids
+const GridServiceCard = ({ service, onSelect }) => (
+  <div onClick={() => onSelect(service)} className="cursor-pointer bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-orange-500/30 transition-shadow duration-300 ease-in-out transform hover:-translate-y-1">
+    <img src={service.image} alt={service.title} className="w-full h-48 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/2d3748/e2e8f0?text=Image+Error'; }}/>
+    <div className="p-4">
+      <p className="text-sm text-orange-400 font-semibold truncate">{service.category}</p>
+      <h3 className="text-md font-bold text-white mt-1 truncate">{service.title}</h3>
+      <p className="text-gray-400 text-sm mt-1">by {service.user}</p>
+      <div className="flex items-center mt-2">
+        <Star className="h-5 w-5 text-yellow-400 fill-current" />
+        <span className="text-white font-bold ml-1">{service.rating}</span>
+      </div>
+      <div className="mt-4 flex justify-between items-center">
+        <p className="text-gray-400 text-xs font-semibold uppercase">Starting at</p>
+        <p className="text-lg font-bold text-white">${service.price}</p>
+      </div>
+    </div>
+  </div>
+);
+
+
+// Service Card Component for Rows
+const RowServiceCard = ({ service, onSelect }) => (
+  <div onClick={() => onSelect(service)} className="cursor-pointer bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-orange-500/30 transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 flex-shrink-0 w-64 sm:w-72">
+    <img src={service.image} alt={service.title} className="w-full h-40 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/2d3748/e2e8f0?text=Image+Error'; }}/>
+    <div className="p-4">
+      <p className="text-sm text-orange-400 font-semibold truncate">{service.category}</p>
+      <h3 className="text-md font-bold text-white mt-1 truncate">{service.title}</h3>
+      <p className="text-gray-400 text-sm mt-1">by {service.user}</p>
+      <div className="flex items-center mt-2">
+        <Star className="h-5 w-5 text-yellow-400 fill-current" />
+        <span className="text-white font-bold ml-1">{service.rating}</span>
+      </div>
+      <div className="mt-4 flex justify-between items-center">
+        <p className="text-gray-400 text-xs font-semibold uppercase">Starting at</p>
+        <p className="text-lg font-bold text-white">${service.price}</p>
+      </div>
+    </div>
+  </div>
+);
+
+// User Card Component
+const UserCard = ({ user }) => (
+    <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-center text-center shadow-lg hover:shadow-orange-500/30 transition-shadow duration-300 ease-in-out transform hover:-translate-y-1 flex-shrink-0 w-48">
+        <img src={user.avatar} alt={user.name} className="w-24 h-24 rounded-full border-4 border-gray-700 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/100x100/718096/1a202c?text=Error'; }}/>
+        <h3 className="text-lg font-bold text-white mt-3">{user.name}</h3>
+        <p className="text-orange-400 text-sm">{user.specialty}</p>
+        <div className="flex items-center mt-2">
+            <Star className="h-5 w-5 text-yellow-400 fill-current" />
+            <span className="text-white font-bold ml-1">{user.rating}</span>
+        </div>
+    </div>
+);
+
+// Category Pills Component
+const CategoryPills = ({ categories, onSelectCategory }) => (
+  <div className="flex justify-center flex-wrap gap-2 sm:gap-4 my-8">
+    {categories.map(category => (
+      <button
+        key={category}
+        onClick={() => onSelectCategory(category)}
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-colors bg-gray-700 hover:bg-orange-500 text-gray-300 hover:text-white"
+      >
+        {categoryIcons[category]}
+        {category}
+      </button>
+    ))}
+  </div>
+);
+
+// Service Row Component
+const ServiceRow = ({ title, services, icon, onSelectService }) => (
+  <section className="mb-12">
+    <div className="flex items-center mb-4">
+      {React.cloneElement(icon, { className: "h-7 w-7 text-orange-400" })}
+      <h2 className="text-2xl font-bold text-white ml-3">{title}</h2>
+    </div>
+    {services.length > 0 ? (
+      <div className="flex gap-6 overflow-x-auto pb-4 -mb-4">
+        {services.map(service => <RowServiceCard key={`${title}-${service.id}`} service={service} onSelect={onSelectService} />)}
+        <div className="flex-shrink-0 w-1"></div> {/* Spacer */}
+      </div>
+    ) : (
+      <div className="bg-gray-800 rounded-lg p-8 text-center">
+        <p className="text-gray-400">No services match the current criteria.</p>
+      </div>
+    )}
+  </section>
+);
+
+// Freelancer Row Component
+const FreelancerRow = ({ title, users, icon }) => (
+    <section className="mb-12">
+        <div className="flex items-center mb-4">
+            {React.cloneElement(icon, { className: "h-7 w-7 text-orange-400" })}
+            <h2 className="text-2xl font-bold text-white ml-3">{title}</h2>
+        </div>
+        <div className="flex gap-6 overflow-x-auto pb-4 -mb-4">
+            {users.map(user => <UserCard key={user.id} user={user} />)}
+            <div className="flex-shrink-0 w-1"></div> {/* Spacer */}
+        </div>
+    </section>
+);
+
+// Footer Component
+const Footer = () => (
+    <footer className="bg-gray-800 text-gray-300">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div> <h3 className="text-white font-bold mb-4">Company</h3> <ul> <li className="mb-2"><a href="#" className="hover:text-white">About Us</a></li> <li className="mb-2"><a href="#" className="hover:text-white">Careers</a></li> <li className="mb-2"><a href="#" className="hover:text-white">Press</a></li> </ul> </div>
+                <div> <h3 className="text-white font-bold mb-4">Support</h3> <ul> <li className="mb-2"><a href="#" className="hover:text-white">Contact Us</a></li> <li className="mb-2"><a href="#" className="hover:text-white">FAQ</a></li> <li className="mb-2"><a href="#" className="hover:text-white">Help & Support</a></li> </ul> </div>
+                <div> <h3 className="text-white font-bold mb-4">Legal</h3> <ul> <li className="mb-2"><a href="#" className="hover:text-white">Terms of Service</a></li> <li className="mb-2"><a href="#" className="hover:text-white">Privacy Policy</a></li> </ul> </div>
+                <div> <h3 className="text-white font-bold mb-4">Connect</h3> <div className="flex space-x-4"> <a href="#" className="text-gray-400 hover:text-white"><Twitter /></a> <a href="#" className="text-gray-400 hover:text-white"><Linkedin /></a> <a href="#" className="text-gray-400 hover:text-white"><Github /></a> </div> </div>
+            </div>
+            <div className="mt-12 border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
+                <p>&copy; {new Date().getFullYear()} BruLance. All rights reserved.</p>
+                <div className="flex items-center mt-4 sm:mt-0"> <Briefcase className="h-6 w-6 text-orange-400" /> <span className="text-lg font-bold text-white ml-2">BruLance</span> </div>
+            </div>
+        </div>
+    </footer>
+);
+
+// Job Detail Page Component
+const JobDetailPage = ({ service, onBack }) => {
+    const seller = users.find(u => u.name === service.user);
+    const [selectedPackage, setSelectedPackage] = useState(service.packages ? service.packages[0] : null);
+    if (!service) return null;
+    const hasPackages = service.packages && service.packages.length > 0;
+    return (
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+            <button onClick={onBack} className="flex items-center gap-2 text-gray-300 hover:text-white mb-6 font-semibold">
+                <ArrowLeft size={20} />
+                Back
+            </button>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-white">{service.title}</h1>
+                    <div className="flex items-center gap-4 mt-2 text-gray-400">
+                        <div className="flex items-center gap-1">
+                            <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                            <span className="text-white font-bold">{service.rating}</span>
+                            <span>({service.reviewsCount} reviews)</span>
+                        </div>
+                    </div>
+                    <img src={service.image} alt={service.title} className="rounded-lg w-full mt-6" />
+                    <div className="mt-8">
+                        <h2 className="text-2xl font-bold text-white mb-4">About This Gig</h2>
+                        <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{service.description || "No description provided."}</p>
+                    </div>
+                    {seller && (
+                        <div className="mt-12">
+                            <h2 className="text-2xl font-bold text-white mb-4">About The Seller</h2>
+                            <div className="bg-gray-800 p-6 rounded-lg flex items-center gap-6">
+                                <img src={seller.avatar} alt={seller.name} className="w-24 h-24 rounded-full object-cover" />
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">{seller.name}</h3>
+                                    <p className="text-orange-400">{seller.specialty}</p>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                                        <span className="text-white font-bold">{seller.rating}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {service.reviews && service.reviews.length > 0 && (
+                         <div className="mt-12">
+                            <h2 className="text-2xl font-bold text-white mb-4">Reviews</h2>
+                            {service.reviews.map(review => (
+                                <div key={review.id} className="bg-gray-800 p-4 rounded-lg mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold">{review.reviewer.charAt(0)}</div>
+                                        <div>
+                                            <h4 className="font-bold text-white">{review.reviewer}</h4>
+                                            <div className="flex items-center gap-1 text-yellow-400">
+                                                {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} className="fill-current" />)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-300 mt-3">{review.comment}</p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="lg:col-span-1">
+                    <div className="sticky top-24">
+                       {hasPackages ? (
+                            <div className="bg-gray-800 rounded-lg p-6">
+                                <div className="flex justify-around border-b border-gray-700 mb-4">
+                                    {service.packages.map(pkg => (
+                                        <button key={pkg.name} onClick={() => setSelectedPackage(pkg)} className={`pb-3 border-b-2 ${selectedPackage?.name === pkg.name ? 'border-orange-500 text-white' : 'border-transparent text-gray-400'}`}>
+                                            {pkg.name}
+                                        </button>
+                                    ))}
+                                </div>
+                                {selectedPackage && (
+                                    <div>
+                                        <div className="flex justify-between items-baseline mb-4">
+                                            <h3 className="text-xl font-bold text-white">{selectedPackage.name}</h3>
+                                            <p className="text-2xl font-bold text-white">${selectedPackage.price}</p>
+                                        </div>
+                                        <p className="text-sm text-gray-400 mb-4">Delivery in {selectedPackage.delivery} days</p>
+                                        <ul className="space-y-2">
+                                            {selectedPackage.features.map(feature => (
+                                                <li key={feature} className="flex items-center gap-2 text-gray-300">
+                                                    <CheckCircle className="text-green-500" size={18} />
+                                                    {feature}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg mt-6 transition-colors">
+                                            Continue (${selectedPackage.price})
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                       ) : (
+                            <div className="bg-gray-800 rounded-lg p-6 text-center">
+                                <h3 className="text-xl font-bold text-white">Contact Seller</h3>
+                                <p className="text-gray-400 mt-2">Pricing and packages are not available for this service. Please contact the seller for a custom quote.</p>
+                                <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg mt-6 transition-colors">
+                                    Contact
+                                </button>
+                            </div>
+                       )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// NEW: Category Page Component
+const CategoryPage = ({ category, services, onSelectService, onBack }) => {
+    const categoryServices = services.filter(s => s.category === category);
+    const Icon = categoryIcons[category];
+
+    return (
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+            <button onClick={onBack} className="flex items-center gap-2 text-gray-300 hover:text-white mb-6 font-semibold">
+                <ArrowLeft size={20} />
+                Back to Home
+            </button>
+            <div className="flex items-center gap-4 mb-8">
+                {Icon && React.cloneElement(Icon, { className: "h-10 w-10 text-orange-400" })}
+                <h1 className="text-4xl font-bold text-white">{category}</h1>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {categoryServices.map(service => (
+                    <GridServiceCard key={service.id} service={service} onSelect={onSelectService} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+
+// Main Application Component
+export default function App() {
+  const [view, setView] = useState('home'); // 'home', 'detail', or 'category'
+  const [selectedService, setSelectedService] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSelectService = (service) => {
+    const fullService = services.find(s => s.id === service.id);
+    setSelectedService(fullService);
+    setView('detail');
+    window.scrollTo(0, 0);
+  };
+
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    setView('category');
+    window.scrollTo(0, 0);
+  };
+
+  const handleGoHome = () => {
+    setSelectedService(null);
+    setSelectedCategory(null);
+    setView('home');
+  };
+
+  const categories = Object.keys(categoryIcons);
+
+  const popularServices = useMemo(() => [...services].sort((a, b) => b.rating - a.rating).slice(0, 8), []);
+  const latestServices = useMemo(() => [...services].sort((a, b) => b.id - a.id).slice(0, 8), []);
+  const relevantServices = useMemo(() => [...services].sort(() => 0.5 - Math.random()).slice(0, 8), []);
+  const featuredUsers = useMemo(() => users.sort(() => 0.5 - Math.random()).slice(0, 8), []);
+
+  const renderContent = () => {
+    switch (view) {
+        case 'detail':
+            return <JobDetailPage service={selectedService} onBack={handleGoHome} />;
+        case 'category':
+            return <CategoryPage category={selectedCategory} services={services} onSelectService={handleSelectService} onBack={handleGoHome} />;
+        case 'home':
+        default:
+            return (
+                <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+                    <div className="text-center mb-6 mt-4">
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">Find the perfect freelance services</h1>
+                        <p className="text-lg text-gray-400 mt-2 max-w-2xl mx-auto">Get your projects done by talented freelancers from around the world.</p>
+                        <div className="relative mt-6 max-w-2xl mx-auto">
+                            <input type="text" placeholder="Search for any service..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-gray-800 border-2 border-gray-700 rounded-lg py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                        </div>
+                    </div>
+                    <CategoryPills categories={categories} onSelectCategory={handleSelectCategory} />
+                    <div className="mt-8">
+                        <ServiceRow title="Popular Job Postings" services={popularServices} icon={<TrendingUp />} onSelectService={handleSelectService} />
+                        <ServiceRow title="Latest Postings" services={latestServices} icon={<Clock />} onSelectService={handleSelectService} />
+                        <ServiceRow title="Relevant To You" services={relevantServices} icon={<UserCheck />} onSelectService={handleSelectService} />
+                        <FreelancerRow title="Featured Freelancers" users={featuredUsers} icon={<Users />} />
+                    </div>
+                </div>
+            );
+    }
+  };
+
+  return (
+    <div className="bg-gray-900 min-h-screen text-white font-sans flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        {renderContent()}
+      </main>
+      <Footer />
+    </div>
+  );
+}
